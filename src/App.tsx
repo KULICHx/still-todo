@@ -2,22 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react'
 import type { Task } from './tasks'
 import { readTasks, saveTasks } from './taskStorage'
 
-const filters = ['all', 'active', 'completed'] as const
+const filters = ['All tasks', 'Active', 'Completed'] as const
 type Filter = (typeof filters)[number]
-
-const filterLabels = {
-  all: 'Все',
-  active: 'Активные',
-  completed: 'Выполненные',
-}
-const emptyMessages = {
-  all: ['Задач пока нет', 'Добавьте первую задачу в поле выше.'],
-  active: ['Активных задач нет', 'Новые задачи появятся здесь.'],
-  completed: [
-    'Выполненных задач пока нет',
-    'Отметьте задачу, и она появится здесь.',
-  ],
-}
 
 type Theme = 'light' | 'dark'
 const themeKey = 'still.theme.v1'
@@ -42,11 +28,12 @@ export default function App() {
   const [initialTasks] = useState(readTasks)
   const [tasks, setTasks] = useState(initialTasks.tasks)
   const [taskError, setTaskError] = useState(initialTasks.error)
-  const [filter, setFilter] = useState<Filter>('all')
+  const [filter, setFilter] = useState<Filter>('All tasks')
   const completedCount = tasks.filter((task) => task.completed).length
   const remainingCount = tasks.length - completedCount
   const visibleTasks = tasks.filter(
-    (task) => filter === 'all' || task.completed === (filter === 'completed'),
+    (task) =>
+      filter === 'All tasks' || task.completed === (filter === 'Completed'),
   )
   const [title, setTitle] = useState('')
   const [theme, setTheme] = useState(getInitialTheme)
@@ -59,7 +46,7 @@ export default function App() {
   function updateTasks(next: Task[]) {
     setTasks(next)
     setTaskError(
-      saveTasks(next) ? null : 'Не удалось сохранить задачи в браузере.',
+      saveTasks(next) ? null : 'Tasks could not be saved in this browser.',
     )
   }
 
@@ -70,7 +57,7 @@ export default function App() {
     const task = { id: crypto.randomUUID(), title: trimmed, completed: false }
     updateTasks([task, ...tasks])
     setTitle('')
-    setFilter('all')
+    setFilter('All tasks')
   }
 
   function toggleTask(id: string) {
@@ -98,21 +85,35 @@ export default function App() {
 
   return (
     <div className="workspace">
-      <main className="main-panel">
-        <header className="page-header">
-          <h1>Список задач</h1>
+      <header className="sidebar">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true" />
+          Still<span className="brand-accent">.</span>
+        </div>
+        <div className="sidebar-controls">
+          <p className="sidebar-note">A quiet place to get things done.</p>
           <button
             className="theme-toggle"
             type="button"
             aria-pressed={theme === 'dark'}
             onClick={toggleTheme}
           >
-            Тёмная тема
+            Dark theme
           </button>
+          {themeError && (
+            <p role="status">Theme preference could not be saved.</p>
+          )}
+        </div>
+      </header>
+
+      <main className="main-panel">
+        <header className="page-header">
+          <h1>My tasks</h1>
+          <p>A little clarity for your day.</p>
         </header>
-        {themeError && <p role="status">Не удалось сохранить тему.</p>}
+
         <form className="task-form" onSubmit={addTask}>
-          <label htmlFor="task-title">Новая задача</label>
+          <label htmlFor="task-title">New task</label>
           <div className="task-entry">
             <input
               id="task-title"
@@ -121,21 +122,21 @@ export default function App() {
               onChange={(event) => setTitle(event.target.value)}
             />
             <button type="submit" disabled={!title.trim()}>
-              Добавить
+              Add task
             </button>
           </div>
         </form>
         {taskError && <p role="alert">{taskError}</p>}
-        <div className="task-filters" role="group" aria-label="Фильтр задач">
+        <div className="task-filters" role="group" aria-label="Filter tasks">
           {filters.map((option) => (
             <button
-              className="filter-button"
+              className="theme-toggle"
               key={option}
               type="button"
               aria-pressed={filter === option}
               onClick={() => setFilter(option)}
             >
-              {filterLabels[option]}
+              {option}
             </button>
           ))}
         </div>
@@ -153,27 +154,41 @@ export default function App() {
                 </label>
                 <button
                   type="button"
-                  aria-label={`Удалить: ${task.title}`}
+                  aria-label={`Delete ${task.title}`}
                   onClick={() => deleteTask(task.id)}
                 >
-                  Удалить
+                  Delete
                 </button>
               </li>
             ))}
           </ul>
         ) : (
           <section className="empty-state" aria-labelledby="empty-title">
-            <h2 id="empty-title">{emptyMessages[filter][0]}</h2>
-            <p>{emptyMessages[filter][1]}</p>
+            <span className="empty-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+                <path
+                  d="m6 12 4 4 8-8"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <h2 id="empty-title">
+              {tasks.length === 0
+                ? 'No tasks yet'
+                : 'No tasks match this filter'}
+            </h2>
           </section>
         )}
         {tasks.length > 0 && (
           <div className="task-progress">
             <span aria-live="polite">
-              Осталось: {remainingCount} · Выполнено: {completedCount}
+              {remainingCount} remaining · {completedCount} completed
             </span>
             <progress
-              aria-label="Выполнение задач"
+              aria-label="Tasks completed"
               value={completedCount}
               max={tasks.length}
             />

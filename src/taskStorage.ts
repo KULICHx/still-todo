@@ -24,7 +24,7 @@ export function readTasks(): { tasks: Task[]; error: string | null } {
     return {
       tasks: [],
       error:
-        'Не удалось прочитать сохранённые задачи. При добавлении задачи начнётся новый список.',
+        'Saved tasks could not be read. Adding a new task will start a new list.',
     }
   }
 }

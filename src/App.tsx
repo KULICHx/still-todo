@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from 'react'
 import {
   createTask,
   removeTask,
@@ -235,7 +241,9 @@ export default function App() {
               key={option}
               type="button"
               aria-pressed={filter === option}
-              aria-label={option === 'Completed' ? filterLabels[option] : undefined}
+              aria-label={
+                option === 'Completed' ? filterLabels[option] : undefined
+              }
               onClick={() => changeFilter(option)}
             >
               {option === 'Completed' ? (
@@ -256,7 +264,11 @@ export default function App() {
             {visibleTasks.map((task) => (
               <li
                 key={task.id}
-                className={`task-item${leavingIds.includes(task.id) ? ' task-item-leaving' : ''}`}
+                className={
+                  leavingIds.includes(task.id)
+                    ? 'task-item task-item-leaving'
+                    : 'task-item'
+                }
                 onAnimationEnd={(event) => {
                   if (
                     event.target === event.currentTarget &&

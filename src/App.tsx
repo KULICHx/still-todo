@@ -61,10 +61,9 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute(
-      'content',
-      theme === 'dark' ? '#19181d' : '#eeebf2',
-    )
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', theme === 'dark' ? '#19181d' : '#eeebf2')
   }, [theme])
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { Task } from './tasks'
+import { readTasks, saveTasks } from './taskStorage'
 
 type Theme = 'light' | 'dark'
 const themeKey = 'still.theme.v1'
@@ -21,7 +22,9 @@ function getSystemTheme(): Theme {
 }
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [initialTasks] = useState(readTasks)
+  const [tasks, setTasks] = useState(initialTasks.tasks)
+  const [taskError, setTaskError] = useState(initialTasks.error)
   const [title, setTitle] = useState('')
   const [theme, setTheme] = useState(getInitialTheme)
   const [themeError, setThemeError] = useState(false)
@@ -30,25 +33,32 @@ export default function App() {
     document.documentElement.dataset.theme = theme
   }, [theme])
 
+  function updateTasks(next: Task[]) {
+    setTasks(next)
+    setTaskError(
+      saveTasks(next) ? null : 'Tasks could not be saved in this browser.',
+    )
+  }
+
   function addTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const trimmed = title.trim()
     if (!trimmed) return
     const task = { id: crypto.randomUUID(), title: trimmed, completed: false }
-    setTasks((current) => [task, ...current])
+    updateTasks([task, ...tasks])
     setTitle('')
   }
 
   function toggleTask(id: string) {
-    setTasks((current) =>
-      current.map((task) =>
+    updateTasks(
+      tasks.map((task) =>
         task.id === id ? { ...task, completed: !task.completed } : task,
       ),
     )
   }
 
   function deleteTask(id: string) {
-    setTasks((current) => current.filter((task) => task.id !== id))
+    updateTasks(tasks.filter((task) => task.id !== id))
   }
 
   function toggleTheme() {
@@ -105,6 +115,7 @@ export default function App() {
             </button>
           </div>
         </form>
+        {taskError && <p role="alert">{taskError}</p>}
         {tasks.length > 0 ? (
           <ul className="task-list">
             {tasks.map((task) => (

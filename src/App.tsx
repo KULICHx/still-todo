@@ -113,7 +113,10 @@ export default function App() {
     cancelLeaving(id)
     if (shouldLeave && !reducedMotion) {
       setLeavingIds((ids) => [...ids, id])
-      leaveTimers.current.set(id, window.setTimeout(() => finishLeaving(id), 400))
+      leaveTimers.current.set(
+        id,
+        window.setTimeout(() => finishLeaving(id), 400),
+      )
     }
 
     updateTasks(toggleTaskCompletion(tasks, id))

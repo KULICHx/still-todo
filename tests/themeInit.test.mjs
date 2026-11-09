@@ -4,7 +4,10 @@ import { URL } from 'node:url'
 import { test } from 'node:test'
 import { runInNewContext } from 'node:vm'
 
-const source = readFileSync(new URL('../public/theme-init.js', import.meta.url), 'utf8')
+const source = readFileSync(
+  new URL('../public/theme-init.js', import.meta.url),
+  'utf8',
+)
 
 function runThemeInit(saved, systemDark) {
   const root = { dataset: {} }

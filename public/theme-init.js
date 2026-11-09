@@ -7,7 +7,9 @@
     theme = undefined
   }
   if (!theme) {
-    theme = globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    theme = globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light'
   }
   globalThis.document.documentElement.dataset.theme = theme
   globalThis.document.querySelector('meta[name="theme-color"]').content =

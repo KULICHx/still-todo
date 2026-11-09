@@ -27,6 +27,8 @@ export function selectTasks(
 ): Task[] {
   return tasks.filter(
     (task) =>
-      leavingIds.includes(task.id) || status === null || task.completed === status,
+      leavingIds.includes(task.id) ||
+      status === null ||
+      task.completed === status,
   )
 }

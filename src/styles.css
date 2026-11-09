@@ -1,0 +1,28 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #292733;
+  background: #f5f4f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+main {
+  max-width: 760px;
+  margin: 15vh auto;
+  padding: 32px;
+}
+
+h1 {
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}

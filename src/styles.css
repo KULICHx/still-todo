@@ -5,6 +5,8 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+  --glow: #ece5f7;
   --surface: #ffffffed;
   --sidebar: #f6f4faab;
   --muted: #6d6878;
@@ -23,7 +25,11 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: clamp(12px, 5vw, 64px);
-  background: radial-gradient(ellipse at top left, #ece5f7, transparent 60%);
+  background: radial-gradient(
+    ellipse at top left,
+    var(--glow),
+    transparent 60%
+  );
 }
 
 .workspace {
@@ -137,4 +143,43 @@ body {
   .sidebar-note {
     display: none;
   }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  color: #efedf3;
+  background: #19181d;
+  --glow: #282230;
+  --surface: #25242aef;
+  --sidebar: #2c2935a6;
+  --muted: #b4aebe;
+  --border: #423c49;
+  --accent: #c2a8f2;
+  --accent-surface: #413650;
+}
+
+.sidebar-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.theme-toggle {
+  justify-self: start;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.theme-toggle[aria-pressed='true'] {
+  color: var(--accent);
+  background: var(--accent-surface);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

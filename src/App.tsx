@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import type { Task } from './tasks'
 
 type Theme = 'light' | 'dark'
 const themeKey = 'still.theme.v1'
@@ -20,12 +21,35 @@ function getSystemTheme(): Theme {
 }
 
 export default function App() {
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [title, setTitle] = useState('')
   const [theme, setTheme] = useState(getInitialTheme)
   const [themeError, setThemeError] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
+
+  function addTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const trimmed = title.trim()
+    if (!trimmed) return
+    const task = { id: crypto.randomUUID(), title: trimmed, completed: false }
+    setTasks((current) => [task, ...current])
+    setTitle('')
+  }
+
+  function toggleTask(id: string) {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    )
+  }
+
+  function deleteTask(id: string) {
+    setTasks((current) => current.filter((task) => task.id !== id))
+  }
 
   function toggleTheme() {
     const nextTheme = theme === 'light' ? 'dark' : 'light'
@@ -67,20 +91,58 @@ export default function App() {
           <p>A little clarity for your day.</p>
         </header>
 
-        <section className="empty-state" aria-labelledby="empty-title">
-          <span className="empty-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
-              <path
-                d="m6 12 4 4 8-8"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <h2 id="empty-title">No tasks yet</h2>
-        </section>
+        <form className="task-form" onSubmit={addTask}>
+          <label htmlFor="task-title">New task</label>
+          <div className="task-entry">
+            <input
+              id="task-title"
+              value={title}
+              maxLength={500}
+              onChange={(event) => setTitle(event.target.value)}
+            />
+            <button type="submit" disabled={!title.trim()}>
+              Add task
+            </button>
+          </div>
+        </form>
+        {tasks.length > 0 ? (
+          <ul className="task-list">
+            {tasks.map((task) => (
+              <li key={task.id} className="task-row">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => toggleTask(task.id)}
+                  />
+                  <span>{task.title}</span>
+                </label>
+                <button
+                  type="button"
+                  aria-label={`Delete ${task.title}`}
+                  onClick={() => deleteTask(task.id)}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <section className="empty-state" aria-labelledby="empty-title">
+            <span className="empty-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+                <path
+                  d="m6 12 4 4 8-8"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <h2 id="empty-title">No tasks yet</h2>
+          </section>
+        )}
       </main>
     </div>
   )

@@ -183,3 +183,73 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+.task-form {
+  display: grid;
+  gap: 8px;
+  margin-block-start: 24px;
+}
+
+.task-entry,
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-entry input {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-entry input,
+.task-entry button,
+.task-row button {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+}
+
+.task-entry button:not(:disabled),
+.task-row button {
+  cursor: pointer;
+}
+
+.task-entry button:not(:disabled) {
+  color: var(--accent);
+  background: var(--accent-surface);
+}
+
+.task-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.task-row {
+  justify-content: space-between;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.task-row label {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.task-row input {
+  accent-color: var(--accent);
+}
+
+.task-row input:checked + span {
+  color: var(--muted);
+  text-decoration: line-through;
+}

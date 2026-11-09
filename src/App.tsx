@@ -4,6 +4,7 @@ import {
   removeTask,
   selectTasks,
   toggleTaskCompletion,
+  type Task,
 } from './tasks'
 import { readTasks, saveTasks } from './taskStorage'
 

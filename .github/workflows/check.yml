@@ -19,6 +19,11 @@ jobs:
       - run: npm ci
       - run: npm audit --omit=dev --audit-level=moderate
       - run: npm run lint
+      - name: Diagnose Prettier output (temporary)
+        run: |
+          echo 'STILL_FORMAT_START'
+          npx prettier src/App.tsx | jq -Rs .
+          echo 'STILL_FORMAT_END'
       - run: npm run format:check
       - run: npm run test
       - run: npm run build

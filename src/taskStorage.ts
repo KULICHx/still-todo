@@ -1,9 +1,29 @@
 import type { Task } from './tasks'
+
 export const TASKS_KEY = 'still.tasks.v1'
-export function readTasks(): { tasks: Task[]; error: string | null } {
+
+type TasksReadResult = {
+  tasks: Task[]
+  error: string | null
+  requiresReset: boolean
+}
+
+export function readTasks(): TasksReadResult {
+  let raw: string | null
+
   try {
-    const raw = localStorage.getItem(TASKS_KEY)
-    if (!raw) return { tasks: [], error: null }
+    raw = localStorage.getItem(TASKS_KEY)
+  } catch {
+    return {
+      tasks: [],
+      error: 'Хранилище браузера недоступно. Изменения могут не сохраниться.',
+      requiresReset: false,
+    }
+  }
+
+  if (raw === null) return { tasks: [], error: null, requiresReset: false }
+
+  try {
     const parsed: unknown = JSON.parse(raw)
     if (
       !Array.isArray(parsed) ||
@@ -17,17 +37,20 @@ export function readTasks(): { tasks: Task[]; error: string | null } {
           typeof task.completed === 'boolean',
       ) ||
       new Set(parsed.map((task) => task.id)).size !== parsed.length
-    )
+    ) {
       throw new Error('Invalid tasks')
-    return { tasks: parsed, error: null }
+    }
+
+    return { tasks: parsed, error: null, requiresReset: false }
   } catch {
     return {
       tasks: [],
-      error:
-        'Saved tasks could not be read. Adding a new task will start a new list.',
+      error: 'Сохранённые задачи повреждены. Данные не перезаписаны.',
+      requiresReset: true,
     }
   }
 }
+
 export function saveTasks(tasks: Task[]): boolean {
   try {
     localStorage.setItem(TASKS_KEY, JSON.stringify(tasks))

@@ -2,6 +2,9 @@ import { useEffect, useState, type FormEvent } from 'react'
 import type { Task } from './tasks'
 import { readTasks, saveTasks } from './taskStorage'
 
+const filters = ['All tasks', 'Active', 'Completed'] as const
+type Filter = (typeof filters)[number]
+
 type Theme = 'light' | 'dark'
 const themeKey = 'still.theme.v1'
 
@@ -25,6 +28,13 @@ export default function App() {
   const [initialTasks] = useState(readTasks)
   const [tasks, setTasks] = useState(initialTasks.tasks)
   const [taskError, setTaskError] = useState(initialTasks.error)
+  const [filter, setFilter] = useState<Filter>('All tasks')
+  const completedCount = tasks.filter((task) => task.completed).length
+  const remainingCount = tasks.length - completedCount
+  const visibleTasks = tasks.filter(
+    (task) =>
+      filter === 'All tasks' || task.completed === (filter === 'Completed'),
+  )
   const [title, setTitle] = useState('')
   const [theme, setTheme] = useState(getInitialTheme)
   const [themeError, setThemeError] = useState(false)
@@ -47,6 +57,7 @@ export default function App() {
     const task = { id: crypto.randomUUID(), title: trimmed, completed: false }
     updateTasks([task, ...tasks])
     setTitle('')
+    setFilter('All tasks')
   }
 
   function toggleTask(id: string) {
@@ -116,9 +127,22 @@ export default function App() {
           </div>
         </form>
         {taskError && <p role="alert">{taskError}</p>}
-        {tasks.length > 0 ? (
+        <div className="task-filters" role="group" aria-label="Filter tasks">
+          {filters.map((option) => (
+            <button
+              className="theme-toggle"
+              key={option}
+              type="button"
+              aria-pressed={filter === option}
+              onClick={() => setFilter(option)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+        {visibleTasks.length > 0 ? (
           <ul className="task-list">
-            {tasks.map((task) => (
+            {visibleTasks.map((task) => (
               <li key={task.id} className="task-row">
                 <label>
                   <input
@@ -151,8 +175,24 @@ export default function App() {
                 />
               </svg>
             </span>
-            <h2 id="empty-title">No tasks yet</h2>
+            <h2 id="empty-title">
+              {tasks.length === 0
+                ? 'No tasks yet'
+                : 'No tasks match this filter'}
+            </h2>
           </section>
+        )}
+        {tasks.length > 0 && (
+          <div className="task-progress">
+            <span aria-live="polite">
+              {remainingCount} remaining · {completedCount} completed
+            </span>
+            <progress
+              aria-label="Tasks completed"
+              value={completedCount}
+              max={tasks.length}
+            />
+          </div>
         )}
       </main>
     </div>
